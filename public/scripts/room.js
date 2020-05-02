@@ -50,7 +50,7 @@ navigator.getUserMedia(
 
     socket.on("can-join-answer", (data) => {
       if (data.able) {
-          joinRoom(peers);peers
+          joinRoom(peers);
       } else {
         console.log("Can't join the chat");
       }
