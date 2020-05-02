@@ -7,11 +7,11 @@ export class Connection {
         this.socket = socket;
         this.peerId = peerId;
         this.room = room;
-        inputStream.getTracks().forEach(track => this.peerConnection.addTrack(track, inputStream));
         this.peerConnection.ontrack = ({ streams: [stream] }) => {
             console.log("ON TRACK");
             outputStreamHandler(this, stream);
         }
+        inputStream.getTracks().forEach(track => this.peerConnection.addTrack(track, inputStream));
     }
 
     getPeerId() {

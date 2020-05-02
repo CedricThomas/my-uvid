@@ -7,13 +7,10 @@ const socket = io.connect("localhost:5000", {query: `room=${room}`});
 const connections = [];
 
 function addLocalStream(connection, stream) {
-  console.log("add stream", connection);
-  const container = document.getElementById('remote-video');
-  // const video = document.createElement('video');
-  // video.id = connection.getPeerId();
-  container.srcObject = stream;
-  container.autoplay = true;
-  // container.appendChild(video);
+  console.log("add stream", stream);
+  const video = document.getElementById('remote-video');
+  video.srcObject = stream;
+  video.autoplay = true;
 }
 
 function handleNewConnection() {

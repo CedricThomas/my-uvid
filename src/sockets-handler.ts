@@ -24,9 +24,7 @@ export class SocketsHandler {
 
             // offer sending
             socket.on("send-offer", (data: any) => {
-                console.log("can join !", data);
                 if (this.roomManager.canJoinRoom(data.room)) {
-                    console.log("accept offer transmission to ", data.to, socket.id);
                     socket.to(data.to).emit("join-offer", {
                         from: socket.id,
                         to: data.to,
@@ -45,7 +43,6 @@ export class SocketsHandler {
             });
 
             socket.on("room", (data: any) => {
-                console.log("room join mec");
                 this.roomManager.addToRoom(socket);
             });
 
