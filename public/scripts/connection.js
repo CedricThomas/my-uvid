@@ -3,12 +3,12 @@ const { RTCPeerConnection, RTCSessionDescription } = window;
 export class Connection {
 
     constructor(socket, inputStream, outputStreamHandler, room, peerId) {
+        this.bound = false;
         this.peerConnection = new RTCPeerConnection();
         this.socket = socket;
         this.peerId = peerId;
         this.room = room;
         this.peerConnection.ontrack = ({ streams: [stream] }) => {
-            console.log("ON TRACK");
             outputStreamHandler(this, stream);
         }
         inputStream.getTracks().forEach(track => this.peerConnection.addTrack(track, inputStream));
@@ -18,20 +18,19 @@ export class Connection {
         return this.peerId;
     }
 
-    registerWaitAnswer() {
+    async sendOffer() {
         this.socket.on("join-answer-" + this.peerId, async data => {
-            console.log("answer received", data.answer);
             await this.peerConnection.setRemoteDescription(
                 new RTCSessionDescription(data.answer)
             );
+            if (!this.bound) {
+               this.sendOffer();
+               this.bound = true;
+            }
         });
-    }
-
-    async sendOffer() {
         const offer = await this.peerConnection.createOffer();
         await this.peerConnection.setLocalDescription(new RTCSessionDescription(offer));
 
-        console.log("offer sent", offer);
         this.socket.emit("send-offer", {
             room: this.room,
             offer,
@@ -47,12 +46,14 @@ export class Connection {
         const answer = await this.peerConnection.createAnswer();
         await this.peerConnection.setLocalDescription(new RTCSessionDescription(answer));
 
-        console.log(answer, offer);
-        console.log("answer sent");
         this.socket.emit("send-answer", {
           answer,
           to: this.peerId,
         });
+    }
+
+    close() {
+        this.peerConnection.close()
     }
 
 }
