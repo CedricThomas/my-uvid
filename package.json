@@ -19,6 +19,7 @@
   "homepage": "https://github.com/CedricThomas/adv_web#readme",
   "devDependencies": {
     "@types/express": "~4.17.6",
+    "@types/node": "~13.13.4",
     "@types/socket.io": "~2.1.4",
     "nodemon": "~2.0.3",
     "ts-node": "~8.9.1",
