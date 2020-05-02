@@ -42,6 +42,16 @@ export class SocketsHandler {
                 });
             });
 
+            // share ice candidate
+            socket.on("send-icecandidate", (data: any) => {
+                socket.to(data.to).emit("update-icecandidate", {
+                    from: socket.id,
+                    to: data.to,
+                    candidate: data.candidate
+                });
+            });
+
+            // join room
             socket.on("room", (data: any) => {
                 this.roomManager.addToRoom(socket);
             });

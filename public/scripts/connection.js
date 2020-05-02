@@ -5,7 +5,6 @@ const configuration = {'iceServers': [{'urls': 'stun:stun.l.google.com:19302'}]}
 export class Connection {
 
     constructor(socket, inputStream, outputStreamHandler, room, peerId) {
-        this.bound = false;
         this.peerConnection = new RTCPeerConnection(configuration);
         this.socket = socket;
         this.peerId = peerId;
@@ -14,6 +13,10 @@ export class Connection {
             outputStreamHandler(this, stream);
         }
         inputStream.getTracks().forEach(track => this.peerConnection.addTrack(track, inputStream));
+
+        this.socket.on("update-icecandidate", async data => {
+            await this.peerConnection.addIceCandidate(data.candidate);
+        });
     }
 
     getPeerId() {
@@ -25,10 +28,6 @@ export class Connection {
             await this.peerConnection.setRemoteDescription(
                 new RTCSessionDescription(data.answer)
             );
-            if (!this.bound) {
-               this.sendOffer();
-               this.bound = true;
-            }
         });
         const offer = await this.peerConnection.createOffer();
         await this.peerConnection.setLocalDescription(offer);
@@ -37,6 +36,14 @@ export class Connection {
             room: this.room,
             offer,
             to: this.peerId
+        });
+        this.peerConnection.addEventListener('icecandidate', event => {
+            if (event.candidate) {
+                this.socket.emit("send-icecandidate", {
+                    candidate: event.candidate,
+                    to: this.peerId
+                });
+            }
         });
     }
 

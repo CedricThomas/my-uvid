@@ -7,6 +7,7 @@ const socket = io.connect("localhost:5000", {query: `room=${room}`});
 const connections = [];
 
 function addLocalStream(connection, stream) {
+  // secure recall from ice candidate
   const container = document.getElementById('container');
   const elem = document.getElementById(connection.getPeerId());
   if (!elem) {
