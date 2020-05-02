@@ -52,7 +52,7 @@ export class SocketsHandler {
             });
 
             // join room
-            socket.on("room", (data: any) => {
+            socket.on("room", () => {
                 this.roomManager.addToRoom(socket);
             });
 

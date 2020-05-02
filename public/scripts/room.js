@@ -3,7 +3,7 @@ import { Connection } from './connection.js';
 
 let userStream = null;
 const room = getParameterByName('id');
-const socket = io.connect("localhost:5000", {query: `room=${room}`});
+const socket = io.connect(`${window.location.origin}`, {query: `room=${room}`});
 const connections = [];
 
 function addLocalStream(connection, stream) {
