@@ -1,43 +1,32 @@
 import { Server as SocketIOServer } from "socket.io";
+import { RoomManager } from "./room-manager";
 
 
 export class SocketsHandler {
 
-
-    private MAX_CLIENTS_BY_ROOM = 5;
+    private roomManager: RoomManager;
 
     constructor(private io: SocketIOServer) {
-    }
-
-    private getCLientsInRoom(room) {
-        if (this.io.sockets.adapter.rooms[room]) {
-           const clients = this.io.sockets.adapter.rooms[room].sockets.keys;
-            return clients;
-        } else {
-            return [];
-        }
-    }
-
-    public canJoinRoom(roomName: string): boolean {
-        return Object.keys(this.getCLientsInRoom(roomName)).length < this.MAX_CLIENTS_BY_ROOM;
+        this.roomManager = new RoomManager();
     }
 
     public registerHandlers() {
         this.io.on("connection", socket => {
 
             const roomName = socket.request._query.room;
-            let joined = false;
 
             socket.on("can-join", (data: any) => {
-                socket.to(socket.id).emit("can-join-answer", {
-                    able: this.canJoinRoom(roomName),
-                    peers: this.getCLientsInRoom(roomName),
+                socket.emit("can-join-answer", {
+                    able: this.roomManager.canJoinRoom(roomName),
+                    peers: this.roomManager.getCLientsInRoom(roomName),
                 });
             });
 
             // offer sending
             socket.on("send-offer", (data: any) => {
-                if (this.canJoinRoom(data.room)) {
+                console.log("can join !", data);
+                if (this.roomManager.canJoinRoom(data.room)) {
+                    console.log("accept offer transmission to ", data.to, socket.id);
                     socket.to(data.to).emit("join-offer", {
                         from: socket.id,
                         to: data.to,
@@ -55,11 +44,18 @@ export class SocketsHandler {
                 });
             });
 
+            socket.on("room", (data: any) => {
+                console.log("room join mec");
+                this.roomManager.addToRoom(socket);
+            });
+
             // handle user disconnection
             socket.on("disconnect", () => {
-                if (joined) {
-                    socket.to(roomName).emit("leaved-room", {
-                        from: socket.id,
+                if (this.roomManager.removeFromRoom(socket)) {
+                    this.roomManager.getCLientsInRoom(roomName).forEach(peer => {
+                        socket.to(peer).emit("leaved-room", {
+                            from: socket.id,
+                        });
                     });
                 }
             });
@@ -67,7 +63,3 @@ export class SocketsHandler {
     }
 
 }
-// can-join
-
-// can-join-answer
-// leaved-room

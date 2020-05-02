@@ -1,45 +1,66 @@
 import { getParameterByName } from './tools.js';
+import { Connection } from './connection.js';
 
+let userStream = null;
 const room = getParameterByName('id');
 const socket = io.connect("localhost:5000", {query: `room=${room}`});
 const connections = [];
 
-function addStream(connection, stream) {
-  const container = document.getElementById('container');
-  const video = document.createElement('video');
-  video.id = connection.getPeerId();
-  video.srcObject = stream;
-  video.autoplay = true;
-  container.appendChild(video);
+function addLocalStream(connection, stream) {
+  console.log("add stream", connection);
+  const container = document.getElementById('remote-video');
+  // const video = document.createElement('video');
+  // video.id = connection.getPeerId();
+  container.srcObject = stream;
+  container.autoplay = true;
+  // container.appendChild(video);
 }
 
 function handleNewConnection() {
+  console.log("waiting offer");
     socket.on("join-offer", async data => {
-        connections.push(new Connection(socket, addStream, room, data.from));
+        console.log("join offer received", data);
+        const conn = new Connection(socket, userStream, addLocalStream, room, data.from)
+        conn.sendAnswerToOffer(data.offer);
+        connections.push(conn);
     });
 }
 
-function joinRoom(peers) {
-  if (peers.lenght === 0) {
-    socket.join(room);
+function joinRoom() {
+  console.log("room joined");
+  handleNewConnection();
+  socket.emit("room");
+}
+
+function askPeersToJoin(peers) {
+  console.log("join room process :", peers);
+  if (peers.length === 0) {
+    joinRoom();
     return;
   }
   for (const peer of peers) {
-    const conn = new Connection(socket, (conn, stream) => {
-      addStream(conn, stream);
+    const conn = new Connection(socket, userStream, (conn, stream) => {
+      addLocalStream(conn, stream);
       connections.push(conn);
-      if (connections.lenght === peers) {
-        handleNewConnection();
-        socket.join(room);
+      console.log("add stream");
+      if (connections.length === peers.length) {
+        joinRoom()
       }
     },
-    room, peer.id);
+    room, peer);
     conn.registerWaitAnswer();
     conn.sendOffer();
     connections.push(conn);
   }
 }
 
+socket.on("can-join-answer", (data) => {
+  if (data.able) {
+    askPeersToJoin(data.peers);
+  } else {
+    console.log("Can't join the chat");
+  }
+});
 navigator.getUserMedia(
   { video: true, audio: true },
   async stream => {
@@ -48,13 +69,7 @@ navigator.getUserMedia(
       localVideo.srcObject = stream;
     }
 
-    socket.on("can-join-answer", (data) => {
-      if (data.able) {
-          joinRoom(peers);
-      } else {
-        console.log("Can't join the chat");
-      }
-    });
+    userStream = stream;
     socket.emit("can-join");
   },
   error => {
