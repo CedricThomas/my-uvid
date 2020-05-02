@@ -1,10 +1,12 @@
 const { RTCPeerConnection, RTCSessionDescription } = window;
 
+const configuration = {'iceServers': [{'urls': 'stun:stun.l.google.com:19302'}]};
+
 export class Connection {
 
     constructor(socket, inputStream, outputStreamHandler, room, peerId) {
         this.bound = false;
-        this.peerConnection = new RTCPeerConnection();
+        this.peerConnection = new RTCPeerConnection(configuration);
         this.socket = socket;
         this.peerId = peerId;
         this.room = room;
@@ -29,7 +31,7 @@ export class Connection {
             }
         });
         const offer = await this.peerConnection.createOffer();
-        await this.peerConnection.setLocalDescription(new RTCSessionDescription(offer));
+        await this.peerConnection.setLocalDescription(offer);
 
         this.socket.emit("send-offer", {
             room: this.room,
@@ -44,7 +46,7 @@ export class Connection {
           );
 
         const answer = await this.peerConnection.createAnswer();
-        await this.peerConnection.setLocalDescription(new RTCSessionDescription(answer));
+        await this.peerConnection.setLocalDescription(answer);
 
         this.socket.emit("send-answer", {
           answer,
