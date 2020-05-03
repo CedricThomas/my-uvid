@@ -26,7 +26,7 @@ export class Connection {
     trySendIceCandidate() {
         if (this.bound && this.candidate) {
             this.socket.emit("send-icecandidate", {
-                candidate: event.candidate,
+                candidate: this.candidate,
                 to: this.peerId
             });
         }
