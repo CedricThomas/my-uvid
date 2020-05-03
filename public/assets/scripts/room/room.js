@@ -89,7 +89,7 @@ window.onload =  () => {
   });
 
   navigator.getUserMedia(
-    { video: true, audio: true },
+    { video: { width: 640, height: 480 }, audio: true },
     async stream => {
       const localVideo = document.getElementById("local-video");
       if (localVideo) {
@@ -127,6 +127,10 @@ window.onload =  () => {
   const username = document.getElementById('username');
   const submit = document.getElementById('submit');
   submit.addEventListener("click", () => {
+    if (username.value.length === 0) {
+      toaster.error("Oops ! You forgot to tell me your name !");
+      return;
+    }
     const container = document.getElementById('container');
     container.removeChild(form);
     connectToRoomAs(username.value);
