@@ -147,6 +147,10 @@ window.onload =  () => {
   const username = document.getElementById('username');
   const submit = document.getElementById('submit');
   submit.addEventListener("click", () => {
+    if (!userStream) {
+      toaster.error("Oops ! Can't fetch you camera !")
+      return;
+    }
     if (username.value.length === 0) {
       toaster.error("Oops ! You forgot to tell me your name !");
       return;
