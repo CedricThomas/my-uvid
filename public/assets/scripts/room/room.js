@@ -1,5 +1,5 @@
 import { toaster } from "../toaster/toaster.js";
-import { getRoomName, copyValueToClipboard } from './tools.js';
+import { getRoomName, copyValueToClipboard, createVideoDivFromStream } from './tools.js';
 import { Connection } from './connection.js';
 
 let userStream = null;
@@ -9,14 +9,9 @@ const connections = [];
 
 function addLocalStream(connection, stream) {
   // secure recall from ice candidate
-  const container = document.getElementById('container');
   const elem = document.getElementById(connection.getPeerId());
   if (!elem) {
-    const video = document.createElement('video');
-    video.id = connection.getPeerId();
-    video.srcObject = stream;
-    video.autoplay = true;
-    container.appendChild(video);
+    createVideoDivFromStream(connection, stream);
   } else {
     elem.srcObject = stream;
   }
@@ -24,8 +19,8 @@ function addLocalStream(connection, stream) {
 
 function handleNewConnection() {
     socket.on("join-offer", async data => {
-          
         const conn = new Connection(socket, userStream, room, {id: data.from, name: data.name}, addLocalStream)
+        toaster.success(`${conn.getName()} joined the room !`)
         conn.sendAnswerToOffer(data.offer);
         connections.push(conn);
     });
@@ -69,8 +64,9 @@ function connectToRoomAs(name) {
   socket.on("leaved-room", (data) => {
     const index = connections.findIndex(conn => conn.getPeerId() === data.from);
     if (index > -1) {
+        toaster.error(`${connections[index].getName()} leaved the room !`)
         const container = document.getElementById('container');
-        const stream = document.getElementById(connections[index].getPeerId());
+        const stream = document.getElementById(`${connections[index].getPeerId()}-container`);
         container.removeChild(stream);
         connections[index].close();
         connections.splice(index, 1);

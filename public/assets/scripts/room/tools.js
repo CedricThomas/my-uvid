@@ -13,3 +13,11 @@ export function copyValueToClipboard(value) {
     document.execCommand('copy');
     document.body.removeChild(dummy);
 }
+
+export function createVideoDivFromStream(stream) {
+    const video = document.createElement('video');
+    video.id = connection.getPeerId();
+    video.srcObject = stream;
+    video.autoplay = true;
+    container.appendChild(video);
+}

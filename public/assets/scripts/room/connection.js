@@ -32,6 +32,10 @@ export class Connection {
         return this.peer.id;
     }
 
+    getName() {
+        return this.peer.name;
+    }
+
     async sendOffer() {
         this.socket.on("join-answer-" + this.peer.id, async data => {
             await this.peerConnection.setRemoteDescription(
