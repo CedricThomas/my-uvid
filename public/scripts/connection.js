@@ -38,7 +38,7 @@ export class Connection {
                 new RTCSessionDescription(data.answer)
             );
             this.bound = true;
-            trySendIceCandidate();
+            this.trySendIceCandidate();
         });
         const offer = await this.peerConnection.createOffer();
         await this.peerConnection.setLocalDescription(offer);
@@ -46,7 +46,7 @@ export class Connection {
         this.peerConnection.addEventListener('icecandidate', event => {
             if (event.candidate) {
                 this.candidate = event.candidate;
-                this.trySendIceCandidate()
+                this.trySendIceCandidate();
             }
         });
         this.socket.emit("send-offer", {
