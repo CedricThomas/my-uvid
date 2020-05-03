@@ -18,12 +18,13 @@ export class SocketsHandler {
     public registerHandlers() {
         this.io.on("connection", socket => {
 
-            const roomName = socket.request._query.room;
+            const room = socket.request._query.room;
+            const username = socket.request._query.name;
 
             socket.on("can-join", (data: any) => {
                 socket.emit("can-join-answer", {
-                    able: this.roomManager.canJoinRoom(roomName),
-                    peers: this.roomManager.getCLientsInRoom(roomName),
+                    able: this.roomManager.canJoinRoom(room),
+                    peers: this.roomManager.getCLientsInRoom(room),
                 });
             });
 
@@ -31,6 +32,7 @@ export class SocketsHandler {
             socket.on("send-offer", (data: any) => {
                 if (this.roomManager.canJoinRoom(data.room)) {
                     socket.to(data.to).emit("join-offer", {
+                        name: username,
                         from: socket.id,
                         to: data.to,
                         offer: data.offer
@@ -58,14 +60,14 @@ export class SocketsHandler {
 
             // join room
             socket.on("room", () => {
-                this.roomManager.addToRoom(socket);
+                this.roomManager.addToRoom(socket, username);
             });
 
             // handle user disconnection
             socket.on("disconnect", () => {
                 if (this.roomManager.removeFromRoom(socket)) {
-                    this.roomManager.getCLientsInRoom(roomName).forEach(peer => {
-                        socket.to(peer).emit("leaved-room", {
+                    this.roomManager.getCLientsInRoom(room).forEach(peer => {
+                        socket.to(peer.id).emit("leaved-room", {
                             from: socket.id,
                         });
                     });

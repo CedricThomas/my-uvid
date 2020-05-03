@@ -4,10 +4,10 @@ const configuration = {'iceServers': [{'urls': 'stun:stun.l.google.com:19302'}]}
 
 export class Connection {
 
-    constructor(socket, inputStream, outputStreamHandler, room, peerId) {
+    constructor(socket, inputStream, outputStreamHandler, room, peer) {
         this.peerConnection = new RTCPeerConnection(configuration);
         this.socket = socket;
-        this.peerId = peerId;
+        this.peer = peer;
         this.room = room;
         this.peerConnection.ontrack = ({ streams: [stream] }) => {
             outputStreamHandler(this, stream);
@@ -18,7 +18,7 @@ export class Connection {
             if (event.candidate) {
                 this.socket.emit("send-icecandidate", {
                     candidate: event.candidate,
-                    to: this.peerId
+                    to: this.peer.id
                 });
             }
         });
@@ -29,11 +29,11 @@ export class Connection {
     }
 
     getPeerId() {
-        return this.peerId;
+        return this.peer.id;
     }
 
     async sendOffer() {
-        this.socket.on("join-answer-" + this.peerId, async data => {
+        this.socket.on("join-answer-" + this.peer.id, async data => {
             await this.peerConnection.setRemoteDescription(
                 new RTCSessionDescription(data.answer)
             );
@@ -45,7 +45,7 @@ export class Connection {
         this.socket.emit("send-offer", {
             room: this.room,
             offer,
-            to: this.peerId
+            to: this.peer.id
         });
     }
 
@@ -58,7 +58,7 @@ export class Connection {
         await this.peerConnection.setLocalDescription(answer);
         this.socket.emit("send-answer", {
           answer,
-          to: this.peerId,
+          to: this.peer.id,
         });
     }
 

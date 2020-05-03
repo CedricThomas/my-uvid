@@ -3,7 +3,7 @@ import { Connection } from './connection.js';
 
 let userStream = null;
 const room = getRoomName();
-const socket = io.connect(`${window.location.origin}`, {query: `room=${room}`});
+const socket = io.connect(`${window.location.origin}`, {query: `room=${room}&name=${"prout"}`});
 const connections = [];
 
 function addLocalStream(connection, stream) {
@@ -23,7 +23,7 @@ function addLocalStream(connection, stream) {
 
 function handleNewConnection() {
     socket.on("join-offer", async data => {
-        const conn = new Connection(socket, userStream, addLocalStream, room, data.from)
+        const conn = new Connection(socket, userStream, addLocalStream, room, {id: data.from, name: data.name})
         conn.sendAnswerToOffer(data.offer);
         connections.push(conn);
     });
@@ -42,7 +42,7 @@ function askPeersToJoin(peers) {
   for (const peer of peers) {
     const conn = new Connection(socket, userStream, (conn, stream) => {
       addLocalStream(conn,stream);
-      if (connections.find(item => item.getPeerId === conn.getPeerId()))
+      if (connections.find(item => item.getPeerId() === conn.getPeerId()))
         return;
       connections.push(conn);
       if (connections.length === peers.length) {
