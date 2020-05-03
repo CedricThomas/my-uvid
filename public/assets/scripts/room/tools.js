@@ -20,7 +20,8 @@ export function syncVideoDivFromStream(connection, stream) {
     const elem = document.getElementById(connection.getPeerId());
     if (!elem) {
         const videoContainer = document.createElement('div');
-        videoContainer.id = `${connection.getPeerId()}-container`
+        videoContainer.id = `${connection.getPeerId()}-container`;
+        videoContainer.className = "video-container";
         videoContainer.innerHTML =
         `
             <p>${connection.getName()}</p>
