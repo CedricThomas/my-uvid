@@ -3,7 +3,7 @@ import { Connection } from './connection.js';
 
 let userStream = null;
 const room = getRoomName();
-const socket = io.connect(`${window.location.origin}`, {query: `room=${room}&name=${"prout"}`});
+let socket = null;
 const connections = [];
 
 function addLocalStream(connection, stream) {
@@ -53,37 +53,53 @@ function askPeersToJoin(peers) {
   }
 }
 
-socket.on("can-join-answer", (data) => {
-  if (data.able) {
-    askPeersToJoin(data.peers);
-  } else {
-    console.log("Can't join the chat");
-  }
-});
 
-socket.on("leaved-room", (data) => {
-  const index = connections.findIndex(conn => conn.getPeerId() === data.from);
-  if (index > -1) {
-      const container = document.getElementById('container');
-      const stream = document.getElementById(connections[index].getPeerId());
-      container.removeChild(stream);
-      connections[index].close();
-      connections.splice(index, 1);
-  }
-});
 
-navigator.getUserMedia(
-  { video: true, audio: true },
-  async stream => {
-    const localVideo = document.getElementById("local-video");
-    if (localVideo) {
-      localVideo.srcObject = stream;
+function connectToRoomAs(name) {
+
+  socket = io.connect(`${window.location.origin}`, {query: `room=${room}&name=${name}`});
+
+  socket.on("can-join-answer", (data) => {
+    if (data.able) {
+      askPeersToJoin(data.peers);
+    } else {
+      console.log("Can't join the chat");
     }
+  });
+  socket.on("leaved-room", (data) => {
+    const index = connections.findIndex(conn => conn.getPeerId() === data.from);
+    if (index > -1) {
+        const container = document.getElementById('container');
+        const stream = document.getElementById(connections[index].getPeerId());
+        container.removeChild(stream);
+        connections[index].close();
+        connections.splice(index, 1);
+    }
+  });
 
-    userStream = stream;
-    socket.emit("can-join");
-  },
-  error => {
-    console.warn(error.message);
-  }
-);
+  socket.emit("can-join");
+}
+
+window.onload =  () => {
+  navigator.getUserMedia(
+    { video: true, audio: true },
+    async stream => {
+      const localVideo = document.getElementById("local-video");
+      if (localVideo) {
+        localVideo.srcObject = stream;
+      }
+  
+      userStream = stream;
+    },
+    error => {
+      console.warn(error.message);
+    }
+  );
+  const form = document.getElementById('username-form');
+  const username = document.getElementById('username');
+  const submit = document.getElementById('submit');
+  submit.addEventListener("click", () => {
+    form.style.display = 'none';
+    connectToRoomAs(username.value);
+  });
+}

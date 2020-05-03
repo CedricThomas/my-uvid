@@ -1,15 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
- <head>
-   <title>UVID</title>
-   <link href="./assets/styles/room.css" rel="stylesheet">
-   <link href="./assets/styles/toaster.css" rel="stylesheet">
-   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
- </head>
- <body>
-    <div id="container">
+
+<head>
+  <title>UVID</title>
+  <link href="./assets/styles/room.css" rel="stylesheet">
+  <link href="./assets/styles/toaster.css" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
+</head>
+
+<body>
+  <div id="container">
+    <div id="username-form">
+      <input id="username" type="text" placeholder="username">
+      <button id="submit">Connect to the chat</button>
     </div>
-    <video autoplay muted id="local-video"></video>
-   <script type="module" src="./assets/scripts/room/room.js"></script>
- </body>
+  </div>
+  <video autoplay muted id="local-video"></video>
+  <div id="control-bar">
+  </div>
+  <script type="module" src="./assets/scripts/room/room.js"></script>
+</body>
+
 </html>
