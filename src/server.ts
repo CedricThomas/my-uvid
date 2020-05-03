@@ -28,7 +28,13 @@ export class Server {
 
 
     private configureApp(): void {
-        this.app.use(express.static(path.join(__dirname, "../public")));
+        this.app.get('/', (req, res) => {
+            res.sendFile(path.join(__dirname + '/../public/index.html'));
+        });
+        this.app.get('/:id', (req, res) => {
+            res.sendFile(path.join(__dirname + '/../public/room.html'));
+        });
+        this.app.use('/assets', express.static(path.join(__dirname, "../public/assets")));
     }
 
     public listen(callback: (port: string | number) => void): void {
