@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from 'uuid';
 
 interface Room {
     id: string,
@@ -50,6 +51,14 @@ export class RoomManager {
             }
         }
         return status;
+    }
+
+    public getValidRoomUUID() {
+        while (true) {
+            const uuid = uuidv4();
+            if (this.rooms.findIndex(room => room.id === uuid) < 0)
+                return uuid;
+        }
     }
 
     public getCLientsInRoom(id) {

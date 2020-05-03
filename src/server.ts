@@ -31,6 +31,10 @@ export class Server {
         this.app.get('/', (req, res) => {
             res.sendFile(path.join(__dirname + '/../public/index.html'));
         });
+        this.app.post('/create', (req, res) => {
+            const uuid = this.socketsHandler.generateRoomUUID();
+            res.json({ id: uuid });
+        });
         this.app.get('/:id', (req, res) => {
             res.sendFile(path.join(__dirname + '/../public/room.html'));
         });

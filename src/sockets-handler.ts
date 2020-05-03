@@ -10,6 +10,11 @@ export class SocketsHandler {
         this.roomManager = new RoomManager();
     }
 
+
+    public generateRoomUUID() {
+        return this.roomManager.getValidRoomUUID();
+    }
+
     public registerHandlers() {
         this.io.on("connection", socket => {
 
