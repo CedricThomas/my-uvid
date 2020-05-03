@@ -1,0 +1,12 @@
+
+body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+p {
+    margin-top: 0px;
+    margin-bottom: 100px;
+}

@@ -3,21 +3,25 @@
 
 <head>
   <title>UVID</title>
+  <link rel="shortcut icon" href="./assets/img/favicon.ico" type="image/x-icon">
+  <link rel="icon" href="./assets/img/favicon.ico" type="image/x-icon">
+  <link href="./assets/styles/common.css" rel="stylesheet">
   <link href="./assets/styles/room.css" rel="stylesheet">
   <link href="./assets/styles/toaster.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css" integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p" crossorigin="anonymous"/>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
 </head>
 
 <body>
   <div id="container">
     <div id="username-form">
-      <input id="username" type="text" placeholder="username">
-      <button id="submit">Connect to the chat</button>
+      <input id="username" type="text" placeholder="Add your name">
+      <button id="submit">Join</button>
     </div>
   </div>
   <video autoplay muted id="local-video"></video>
-  <button id="audio-status-controller">Audio</button>
-  <button id="clipboard">Copy</button>
+  <button class="rounded-button" id="audio-status-controller"><i id="audio-icon" class="fa fa-microphone icon-4x"></i></button>
+  <button class="rounded-button" id="clipboard"><i class="fa fa-link icon-4x"></i></button>
   <script type="module" src="./assets/scripts/room/room.js"></script>
 </body>
 

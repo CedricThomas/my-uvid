@@ -97,10 +97,17 @@ window.onload =  () => {
       audioCtrl.addEventListener("click", () => {
         userStream.getAudioTracks()[0].enabled = !userStream.getAudioTracks()[0].enabled;
         const status = userStream.getAudioTracks()[0].enabled;
+        const icon = document.getElementById("audio-icon");
         if (status) {
-            // TODO css trick
+          icon.classList.remove("fa-microphone-slash");
+          audioCtrl.classList.remove("red");
+          icon.classList.add("fa-microphone");
+          audioCtrl.classList.add("green");
         } else {
-
+          icon.classList.remove("fa-microphone");
+          audioCtrl.classList.remove("green");
+          icon.classList.add("fa-microphone-slash");
+          audioCtrl.classList.add("red");
         }
       });
     },

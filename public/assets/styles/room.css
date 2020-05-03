@@ -1,9 +1,3 @@
-body, html {
-    width: 100%;
-    height: 100%;
-    padding: 0px;
-    margin: 0px;
-}
 
 #local-video {
     position: absolute;
@@ -34,4 +28,36 @@ body, html {
     align-items: center;
     justify-content: center;
     flex-direction: column;
+}
+
+#username-form > * {
+    margin: 15px;
+}
+
+#audio-status-controller {
+    position: absolute;
+    bottom: 40px;
+    left: calc(50% - 120px);
+}
+
+#clipboard {
+    position: absolute;
+    bottom: 40px;
+    right: calc(50% - 120px);
+}
+
+.rounded-button {
+    display:block;
+    height: 60px;
+    width: 60px;
+    border-radius: 30px;
+    padding: 0;
+}
+
+.green {
+    background-color: #04B074;
+}
+
+.red {
+    background-color: #CA5B53;
 }
