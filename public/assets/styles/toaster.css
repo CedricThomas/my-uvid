@@ -66,17 +66,17 @@
 }
 
 @keyframes right-travel {
-    0% {left: 0px;}
-    25% {left: 5px;}
-    50% {left: 10px;}
-    75% {left: 15px;}
-    100% {left: 20px;}
+    0% {left: -0px;}
+    25% {left: -5px;}
+    50% {left: -10px;}
+    75% {left: -15px;}
+    100% {left: -20px;}
 }
 
 @-webkit-keyframes right-travel {
-    0% {left: 0px;}
-    25% {left: 5px;}
-    50% {left: 10px;}
-    75% {left: 15px;}
-    100% {left: 20px;}
+    0% {left: -0px;}
+    25% {left: -5px;}
+    50% {left: -10px;}
+    75% {left: -15px;}
+    100% {left: -20px;}
 }

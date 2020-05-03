@@ -1,3 +1,4 @@
+import { toaster } from "../toaster/toaster.js";
 import { getRoomName, copyValueToClipboard } from './tools.js';
 import { Connection } from './connection.js';
 
@@ -23,6 +24,7 @@ function addLocalStream(connection, stream) {
 
 function handleNewConnection() {
     socket.on("join-offer", async data => {
+          
         const conn = new Connection(socket, userStream, room, {id: data.from, name: data.name}, addLocalStream)
         conn.sendAnswerToOffer(data.offer);
         connections.push(conn);
@@ -82,6 +84,7 @@ window.onload =  () => {
   const audioCtrl = document.getElementById('audio-status-controller');
   const clipboard = document.getElementById('clipboard');
   clipboard.addEventListener("click", () => {
+    toaster.info(`Room URL copied !`)
     copyValueToClipboard(window.location.href);
   });
 
