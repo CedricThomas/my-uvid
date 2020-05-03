@@ -102,11 +102,13 @@ window.onload =  () => {
         const status = userStream.getAudioTracks()[0].enabled;
         const icon = document.getElementById("audio-icon");
         if (status) {
+          toaster.success(`Microphone unmuted !`)
           icon.classList.remove("fa-microphone-slash");
           audioCtrl.classList.remove("red");
           icon.classList.add("fa-microphone");
           audioCtrl.classList.add("green");
         } else {
+          toaster.error(`Microphone muted !`)
           icon.classList.remove("fa-microphone");
           audioCtrl.classList.remove("green");
           icon.classList.add("fa-microphone-slash");
@@ -122,7 +124,8 @@ window.onload =  () => {
   const username = document.getElementById('username');
   const submit = document.getElementById('submit');
   submit.addEventListener("click", () => {
-    form.style.display = 'none';
+    const container = document.getElementById('container');
+    container.removeChild(form);
     connectToRoomAs(username.value);
   });
 }
