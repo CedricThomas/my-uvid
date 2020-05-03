@@ -1,5 +1,5 @@
 import { toaster } from "../toaster/toaster.js";
-import { getRoomName, copyValueToClipboard, createVideoDivFromStream } from './tools.js';
+import { getRoomName, copyValueToClipboard } from './tools.js';
 import { Connection } from './connection.js';
 
 let userStream = null;
@@ -9,9 +9,14 @@ const connections = [];
 
 function addLocalStream(connection, stream) {
   // secure recall from ice candidate
+  const container = document.getElementById('container');
   const elem = document.getElementById(connection.getPeerId());
   if (!elem) {
-    createVideoDivFromStream(connection, stream);
+    const video = document.createElement('video');
+    video.id = connection.getPeerId();
+    video.srcObject = stream;
+    video.autoplay = true;
+    container.appendChild(video);
   } else {
     elem.srcObject = stream;
   }
@@ -19,8 +24,8 @@ function addLocalStream(connection, stream) {
 
 function handleNewConnection() {
     socket.on("join-offer", async data => {
-        const conn = new Connection(socket, userStream, room, {id: data.from, name: data.name}, addLocalStream)
-        toaster.success(`${conn.getName()} joined the room !`)
+        const conn = new Connection(socket, userStream, room, {id: data.from, name: data.name}, addLocalStream);
+        toaster.success(`${conn.getName()} joined the room !`);
         conn.sendAnswerToOffer(data.offer);
         connections.push(conn);
     });
@@ -64,9 +69,9 @@ function connectToRoomAs(name) {
   socket.on("leaved-room", (data) => {
     const index = connections.findIndex(conn => conn.getPeerId() === data.from);
     if (index > -1) {
-        toaster.error(`${connections[index].getName()} leaved the room !`)
+        toaster.error(`${connections[index].getName()} leaved the room !`);
         const container = document.getElementById('container');
-        const stream = document.getElementById(`${connections[index].getPeerId()}-container`);
+        const stream = document.getElementById(connections[index].getPeerId());
         container.removeChild(stream);
         connections[index].close();
         connections.splice(index, 1);
@@ -80,7 +85,7 @@ window.onload =  () => {
   const audioCtrl = document.getElementById('audio-status-controller');
   const clipboard = document.getElementById('clipboard');
   clipboard.addEventListener("click", () => {
-    toaster.info(`Room URL copied !`)
+    toaster.info(`Room URL copied !`);
     copyValueToClipboard(window.location.href);
   });
 
@@ -98,13 +103,13 @@ window.onload =  () => {
         const status = userStream.getAudioTracks()[0].enabled;
         const icon = document.getElementById("audio-icon");
         if (status) {
-          toaster.success(`Microphone unmuted !`)
+          toaster.success(`Microphone unmuted !`);
           icon.classList.remove("fa-microphone-slash");
           audioCtrl.classList.remove("red");
           icon.classList.add("fa-microphone");
           audioCtrl.classList.add("green");
         } else {
-          toaster.error(`Microphone muted !`)
+          toaster.error(`Microphone muted !`);
           icon.classList.remove("fa-microphone");
           audioCtrl.classList.remove("green");
           icon.classList.add("fa-microphone-slash");

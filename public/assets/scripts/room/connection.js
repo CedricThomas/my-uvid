@@ -24,7 +24,8 @@ export class Connection {
         });
 
         this.socket.on("update-icecandidate", async data => {
-            await this.peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
+            if (this.peerConnection.iceConnectionState !== "closed")
+                await this.peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
          });
     }
 

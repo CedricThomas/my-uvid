@@ -17,10 +17,8 @@
     height: 100%;
 }
 
-#container > * {
-    flex: auto;
-    width: 30vw;
-    height: 20vw;
+.container-ready > * {
+
 }
 
 #username-form {

@@ -14,10 +14,18 @@ export function copyValueToClipboard(value) {
     document.body.removeChild(dummy);
 }
 
-export function createVideoDivFromStream(stream) {
-    const video = document.createElement('video');
-    video.id = connection.getPeerId();
+export function createVideoDivFromStream(connection, stream) {
+    const container = document.getElementById('container');
+
+    const videoContainer = document.createElement('div');
+    videoContainer.id = `${connection.getPeerId()}-container`
+    videoContainer.innerHTML =
+    `
+        <video id="${connection.getPeerId()}">
+    `
+
+    container.appendChild(videoContainer);
+    const video = document.getElementById(connection.getPeerId());
     video.srcObject = stream;
-    video.autoplay = true;
-    container.appendChild(video);
+    console.log("created");
 }
