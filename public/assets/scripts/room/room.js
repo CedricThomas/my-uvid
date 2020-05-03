@@ -92,6 +92,10 @@ window.onload =  () => {
   navigator.getUserMedia(
     { video: { width: 640, height: 480 }, audio: true },
     async stream => {
+      if (!stream) {
+        toaster.error("Oops ! Can't fetch you camera !")
+        return;
+      }
       const localVideo = document.getElementById("local-video");
       if (localVideo) {
         localVideo.srcObject = stream;
