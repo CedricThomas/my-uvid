@@ -1,4 +1,4 @@
-import { getRoomName } from './tools.js';
+import { getRoomName, copyValueToClipboard } from './tools.js';
 import { Connection } from './connection.js';
 
 let userStream = null;
@@ -61,7 +61,7 @@ function connectToRoomAs(name) {
     if (data.able) {
       askPeersToJoin(data.peers);
     } else {
-      console.log("Can't join the chat");
+      toaster.error("Chat room is full");
     }
   });
   socket.on("leaved-room", (data) => {
@@ -80,6 +80,10 @@ function connectToRoomAs(name) {
 
 window.onload =  () => {
   const audioCtrl = document.getElementById('audio-status-controller');
+  const clipboard = document.getElementById('clipboard');
+  clipboard.addEventListener("click", () => {
+    copyValueToClipboard(window.location.href);
+  });
 
   navigator.getUserMedia(
     { video: true, audio: true },
@@ -94,14 +98,14 @@ window.onload =  () => {
         userStream.getAudioTracks()[0].enabled = !userStream.getAudioTracks()[0].enabled;
         const status = userStream.getAudioTracks()[0].enabled;
         if (status) {
-
+            // TODO css trick
         } else {
 
         }
       });
     },
     error => {
-      console.warn(error.message);
+
     }
   );
   const form = document.getElementById('username-form');
