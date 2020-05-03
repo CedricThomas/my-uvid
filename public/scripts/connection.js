@@ -9,7 +9,9 @@ export class Connection {
         this.socket = socket;
         this.peerId = peerId;
         this.room = room;
+        this.stream = null;
         this.peerConnection.ontrack = ({ streams: [stream] }) => {
+            this.stream = stream;
             outputStreamHandler(this, stream);
         }
         inputStream.getTracks().forEach(track => this.peerConnection.addTrack(track, inputStream));
@@ -32,11 +34,6 @@ export class Connection {
         const offer = await this.peerConnection.createOffer();
         await this.peerConnection.setLocalDescription(offer);
 
-        this.socket.emit("send-offer", {
-            room: this.room,
-            offer,
-            to: this.peerId
-        });
         this.peerConnection.addEventListener('icecandidate', event => {
             if (event.candidate) {
                 this.socket.emit("send-icecandidate", {
@@ -44,6 +41,11 @@ export class Connection {
                     to: this.peerId
                 });
             }
+        });
+        this.socket.emit("send-offer", {
+            room: this.room,
+            offer,
+            to: this.peerId
         });
     }
 

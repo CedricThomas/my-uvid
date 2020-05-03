@@ -62,6 +62,7 @@ export class RoomManager {
     }
 
     public canJoinRoom(roomName: string): boolean {
+        console.log(this.getCLientsInRoom(roomName).length, this.MAX_CLIENTS_BY_ROOM);
         return this.getCLientsInRoom(roomName).length < this.MAX_CLIENTS_BY_ROOM;
     }
 

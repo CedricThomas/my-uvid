@@ -40,11 +40,17 @@ function askPeersToJoin(peers) {
     return;
   }
   for (const peer of peers) {
-    const conn = new Connection(socket, userStream, addLocalStream, room, peer);
+    const conn = new Connection(socket, userStream, (conn, stream) => {
+      addLocalStream(conn,stream);
+      if (connections.find(item => item.getPeerId === conn.getPeerId()))
+        return;
+      connections.push(conn);
+      if (connections.length === peers.length) {
+        joinRoom();
+      }
+    }, room, peer);
     conn.sendOffer();
-    connections.push(conn);
   }
-  joinRoom();
 }
 
 socket.on("can-join-answer", (data) => {
