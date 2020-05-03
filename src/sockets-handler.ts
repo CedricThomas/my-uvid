@@ -58,6 +58,15 @@ export class SocketsHandler {
                 });
             });
 
+            // change sound status
+            socket.on("audio-status", (data: any) => {
+                socket.to(data.to).emit("audio-status", {
+                    from: socket.id,
+                    to: data.to,
+                    status: data.status
+                });
+            });
+
             // join room
             socket.on("room", () => {
                 this.roomManager.addToRoom(socket, username);

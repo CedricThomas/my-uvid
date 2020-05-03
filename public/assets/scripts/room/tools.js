@@ -14,18 +14,22 @@ export function copyValueToClipboard(value) {
     document.body.removeChild(dummy);
 }
 
-export function createVideoDivFromStream(connection, stream) {
+export function syncVideoDivFromStream(connection, stream) {
     const container = document.getElementById('container');
 
-    const videoContainer = document.createElement('div');
-    videoContainer.id = `${connection.getPeerId()}-container`
-    videoContainer.innerHTML =
-    `
-        <video id="${connection.getPeerId()}">
-    `
+    const elem = document.getElementById(connection.getPeerId());
+    if (!elem) {
+        const videoContainer = document.createElement('div');
+        videoContainer.id = `${connection.getPeerId()}-container`
+        videoContainer.innerHTML =
+        `
+            <p>${connection.getName()}</p>
+            <video autoplay id="${connection.getPeerId()}"></video>
+            <i id="audio-${connection.getPeerId()}"></i>
+        `
+        container.appendChild(videoContainer);
+    }
 
-    container.appendChild(videoContainer);
     const video = document.getElementById(connection.getPeerId());
     video.srcObject = stream;
-    console.log("created");
 }

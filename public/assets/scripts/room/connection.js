@@ -9,10 +9,18 @@ export class Connection {
         this.socket = socket;
         this.peer = peer;
         this.room = room;
+        this.remoteAudio = true;
+        this.audioListener = null;
         this.peerConnection.ontrack = ({ streams: [stream] }) => {
             outputStreamHandler(this, stream);
         }
         inputStream.getTracks().forEach(track => this.peerConnection.addTrack(track, inputStream));
+
+        this.socket.on("audio-status", async data => {
+            this.remoteAudio = data.status;
+            if (this.audioListener)
+                this.audioListener(this.remoteAudio);
+          });
 
         this.peerConnection.addEventListener('icecandidate', event => {
             if (event.candidate) {
@@ -35,6 +43,21 @@ export class Connection {
 
     getName() {
         return this.peer.name;
+    }
+
+    setAudioListener(listener) {
+        this.audioListener = listener;
+    }
+
+    getAudioState() {
+        return this.remoteAudio;
+    }
+
+    changeSoundState(status) {
+        this.socket.emit("audio-status", {
+            status,
+            to: this.peer.id
+          });
     }
 
     async sendOffer() {

@@ -1,5 +1,5 @@
 import { toaster } from "../toaster/toaster.js";
-import { getRoomName, copyValueToClipboard } from './tools.js';
+import { getRoomName, copyValueToClipboard, syncVideoDivFromStream } from './tools.js';
 import { Connection } from './connection.js';
 
 let userStream = null;
@@ -8,24 +8,20 @@ let socket = null;
 const connections = [];
 
 function addLocalStream(connection, stream) {
-  // secure recall from ice candidate
-  const container = document.getElementById('container');
-  const elem = document.getElementById(connection.getPeerId());
-  if (!elem) {
-    const video = document.createElement('video');
-    video.id = connection.getPeerId();
-    video.srcObject = stream;
-    video.autoplay = true;
-    container.appendChild(video);
-  } else {
-    elem.srcObject = stream;
-  }
+  syncVideoDivFromStream(connection, stream);
+  const audioListener = (status) => {
+    const audio = document.getElementById(`audio-${connection.getPeerId()}`);
+    audio.className = status ? 'fa fa-microphone' : 'fa fa-microphone-slash';
+  };
+  audioListener(connection.getAudioState());
+  connection.setAudioListener(audioListener);
 }
 
 function handleNewConnection() {
     socket.on("join-offer", async data => {
         const conn = new Connection(socket, userStream, room, {id: data.from, name: data.name}, addLocalStream);
         toaster.success(`${conn.getName()} joined the room !`);
+        conn.changeSoundState(userStream.getAudioTracks()[0].enabled);
         conn.sendAnswerToOffer(data.offer);
         connections.push(conn);
     });
@@ -34,6 +30,9 @@ function handleNewConnection() {
 function joinRoom() {
   handleNewConnection();
   socket.emit("room");
+  for (const conn of connections) {
+    conn.changeSoundState(userStream.getAudioTracks()[0].enabled);
+  }
 }
 
 function askPeersToJoin(peers) {
@@ -71,7 +70,7 @@ function connectToRoomAs(name) {
     if (index > -1) {
         toaster.error(`${connections[index].getName()} leaved the room !`);
         const container = document.getElementById('container');
-        const stream = document.getElementById(connections[index].getPeerId());
+        const stream = document.getElementById(`${connections[index].getPeerId()}-container`);
         container.removeChild(stream);
         connections[index].close();
         connections.splice(index, 1);
@@ -114,6 +113,9 @@ window.onload =  () => {
           audioCtrl.classList.remove("green");
           icon.classList.add("fa-microphone-slash");
           audioCtrl.classList.add("red");
+        }
+        for (const conn of connections) {
+          conn.changeSoundState(status);
         }
       });
     },
