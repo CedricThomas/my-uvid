@@ -25,6 +25,8 @@ body, html {
 
 #container > * {
     flex: auto;
+    width: 720px;
+    height: 480px;
 }
 
 #username-form {

@@ -4,7 +4,7 @@ const configuration = {'iceServers': [{'urls': 'stun:stun.l.google.com:19302'}]}
 
 export class Connection {
 
-    constructor(socket, inputStream, outputStreamHandler, room, peer) {
+    constructor(socket, inputStream, room, peer, outputStreamHandler) {
         this.peerConnection = new RTCPeerConnection(configuration);
         this.socket = socket;
         this.peer = peer;

@@ -23,7 +23,7 @@ function addLocalStream(connection, stream) {
 
 function handleNewConnection() {
     socket.on("join-offer", async data => {
-        const conn = new Connection(socket, userStream, addLocalStream, room, {id: data.from, name: data.name})
+        const conn = new Connection(socket, userStream, room, {id: data.from, name: data.name}, addLocalStream)
         conn.sendAnswerToOffer(data.offer);
         connections.push(conn);
     });
@@ -40,7 +40,7 @@ function askPeersToJoin(peers) {
     return;
   }
   for (const peer of peers) {
-    const conn = new Connection(socket, userStream, (conn, stream) => {
+    const conn = new Connection(socket, userStream, room, peer, (conn, stream) => {
       addLocalStream(conn,stream);
       if (connections.find(item => item.getPeerId() === conn.getPeerId()))
         return;
@@ -48,12 +48,10 @@ function askPeersToJoin(peers) {
       if (connections.length === peers.length) {
         joinRoom();
       }
-    }, room, peer);
+    });
     conn.sendOffer();
   }
 }
-
-
 
 function connectToRoomAs(name) {
 
@@ -81,6 +79,8 @@ function connectToRoomAs(name) {
 }
 
 window.onload =  () => {
+  const audioCtrl = document.getElementById('audio-status-controller');
+
   navigator.getUserMedia(
     { video: true, audio: true },
     async stream => {
@@ -88,8 +88,17 @@ window.onload =  () => {
       if (localVideo) {
         localVideo.srcObject = stream;
       }
-  
       userStream = stream;
+
+      audioCtrl.addEventListener("click", () => {
+        userStream.getAudioTracks()[0].enabled = !userStream.getAudioTracks()[0].enabled;
+        const status = userStream.getAudioTracks()[0].enabled;
+        if (status) {
+
+        } else {
+
+        }
+      });
     },
     error => {
       console.warn(error.message);
