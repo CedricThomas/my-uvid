@@ -9,27 +9,27 @@ export class Connection {
         this.socket = socket;
         this.peerId = peerId;
         this.room = room;
-        this.stream = null;
-        this.bound = false;
-        this.candidate = null;
         this.peerConnection.ontrack = ({ streams: [stream] }) => {
-            this.stream = stream;
             outputStreamHandler(this, stream);
         }
         inputStream.getTracks().forEach(track => this.peerConnection.addTrack(track, inputStream));
+
+        this.peerConnection.addEventListener('icecandidate', event => {
+            if (event.candidate) {
+                this.socket.emit("send-icecandidate", {
+                    candidate: event.candidate,
+                    to: this.peerId
+                });
+            }
+        });
+
+        this.socket.on("update-icecandidate", async data => {
+            await this.peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
+         });
     }
 
     getPeerId() {
         return this.peerId;
-    }
-
-    trySendIceCandidate() {
-        if (this.bound && this.candidate) {
-            this.socket.emit("send-icecandidate", {
-                candidate: this.candidate,
-                to: this.peerId
-            });
-        }
     }
 
     async sendOffer() {
@@ -38,17 +38,10 @@ export class Connection {
                 new RTCSessionDescription(data.answer)
             );
             this.bound = true;
-            this.trySendIceCandidate();
         });
         const offer = await this.peerConnection.createOffer();
         await this.peerConnection.setLocalDescription(offer);
 
-        this.peerConnection.addEventListener('icecandidate', event => {
-            if (event.candidate) {
-                this.candidate = event.candidate;
-                this.trySendIceCandidate();
-            }
-        });
         this.socket.emit("send-offer", {
             room: this.room,
             offer,
@@ -63,10 +56,6 @@ export class Connection {
 
         const answer = await this.peerConnection.createAnswer();
         await this.peerConnection.setLocalDescription(answer);
-
-        this.socket.on("update-icecandidate", async data => {
-            await this.peerConnection.addIceCandidate(data.candidate);
-        });
         this.socket.emit("send-answer", {
           answer,
           to: this.peerId,
