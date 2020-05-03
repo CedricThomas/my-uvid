@@ -38,7 +38,7 @@
     z-index: 1;
     position: absolute;
     padding: 5px;
-    width: 100%;
+    width: calc(100% - 10px);
     left: 0px;
     top: 0px;
     color: white;
