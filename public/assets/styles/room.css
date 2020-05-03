@@ -39,7 +39,7 @@
     position: absolute;
     right: 10px;
     bottom: 10px;
-    color: black;
+    color: white;
 }
 
 .video-container p {
@@ -70,10 +70,16 @@
     left: calc(50% - 120px);
 }
 
+#video-status-controller {
+    position: absolute;
+    bottom: 40px;
+    left: calc(50% - 30px);
+}
+
 #clipboard {
     position: absolute;
     bottom: 40px;
-    right: calc(50% - 120px);
+    left: calc(50% + 60px);
 }
 
 .rounded-button {

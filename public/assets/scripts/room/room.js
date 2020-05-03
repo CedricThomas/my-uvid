@@ -81,6 +81,7 @@ function connectToRoomAs(name) {
 }
 
 window.onload =  () => {
+  const videoCtrl = document.getElementById('video-status-controller');
   const audioCtrl = document.getElementById('audio-status-controller');
   const clipboard = document.getElementById('clipboard');
   clipboard.addEventListener("click", () => {
@@ -118,6 +119,21 @@ window.onload =  () => {
           conn.changeSoundState(status);
         }
       });
+      videoCtrl.addEventListener("click", () => {
+        userStream.getVideoTracks()[0].enabled = !userStream.getVideoTracks()[0].enabled;
+        const status = userStream.getVideoTracks()[0].enabled;
+        if (status) {
+          toaster.success(`Video shared !`);
+          videoCtrl.classList.remove("red");
+          videoCtrl.classList.add("green");
+        } else {
+          toaster.error(`Video masked !`);
+          videoCtrl.classList.remove("green");
+          videoCtrl.classList.add("red");
+        }
+
+      });
+
     },
     error => {
 
